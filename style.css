@@ -810,3 +810,85 @@ footer p {
     font-size: 12px;
   }
 }
+/* CANDY MATCH GAME */
+
+.candy-game {
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.candy-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.candy-stats div {
+  flex: 1;
+  background: linear-gradient(135deg, #702cff, #087fbb);
+  padding: 14px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+}
+
+.candy-board {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  background: #151d3b;
+  padding: 10px;
+  border: 2px solid #713bff;
+  border-radius: 15px;
+}
+
+.candy-cell {
+  aspect-ratio: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 9px;
+  background: #26345e;
+  font-size: clamp(17px, 4vw, 30px);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.candy-cell:hover {
+  transform: scale(1.08);
+  background: #394b7c;
+}
+
+.candy-cell.selected-candy {
+  background: #713bff;
+  outline: 3px solid #00d9ff;
+  transform: scale(1.08);
+}
+
+#candy-message {
+  color: #00d9ff;
+  margin: 20px 0;
+}
+
+#candy-restart {
+  background: linear-gradient(90deg, #ff4da6, #713bff);
+  color: white;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 500px) {
+  .candy-board {
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .candy-stats {
+    font-size: 12px;
+  }
+}
