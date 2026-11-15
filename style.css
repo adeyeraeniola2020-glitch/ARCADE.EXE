@@ -724,3 +724,89 @@ footer p {
     font-size: 13px;
   }
 }
+/* MEMORY MATCH GAME */
+
+.memory-game {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.memory-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.memory-stats div {
+  background: #202b55;
+  padding: 14px 8px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.memory-card {
+  aspect-ratio: 1;
+  border: 2px solid #713bff;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #713bff, #00bfff);
+  color: white;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.memory-card:hover {
+  transform: scale(1.05);
+}
+
+.memory-card.flipped {
+  background: #ffffff;
+  color: #111831;
+  border-color: #00d9ff;
+}
+
+.memory-card.matched {
+  background: #087f5b;
+  border-color: #20e3a2;
+  cursor: default;
+}
+
+#memory-message {
+  color: #00d9ff;
+  margin: 25px 0 15px;
+}
+
+#memory-restart {
+  background: linear-gradient(90deg, #713bff, #00bfff);
+  color: white;
+  border: none;
+  padding: 13px 28px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 500px) {
+  .memory-grid {
+    gap: 8px;
+  }
+
+  .memory-card {
+    font-size: 25px;
+  }
+
+  .memory-stats {
+    font-size: 12px;
+  }
+}
