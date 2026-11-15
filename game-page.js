@@ -55,12 +55,15 @@ if (game) {
   startButton.textContent = "START GAME";
 
   startButton.addEventListener("click", () => {
+  if (game.id === "space-runner") {
+    startSpaceRunner();
+  } else {
     screenDescription.textContent =
-      "This game is being prepared. Its playable version will be added next.";
+      "This game is coming soon. Stay tuned!";
     startButton.textContent = "COMING SOON";
     startButton.disabled = true;
-  });
-
+  }
+});
   const relatedGames = games
     .filter(item => item.category === game.category && item.id !== game.id)
     .slice(0, 4);
@@ -102,3 +105,168 @@ fullscreenButton.addEventListener("click", () => {
     document.exitFullscreen?.();
   }
 });
+function startSpaceRunner() {
+  const gameContent = document.getElementById("game-content");
+
+  gameContent.innerHTML = `
+    <div class="space-game">
+      <div class="space-score">
+        ⭐ Score: <span id="space-score">0</span>
+      </div>
+
+      <canvas id="space-canvas" width="700" height="450"></canvas>
+
+      <p class="space-help">
+        Move your spaceship left and right. Avoid asteroids and collect stars.
+        On a phone, drag your finger across the game.
+      </p>
+
+      <button id="restart-space">RESTART GAME</button>
+    </div>
+  `;
+
+  const canvas = document.getElementById("space-canvas");
+  const ctx = canvas.getContext("2d");
+  const scoreDisplay = document.getElementById("space-score");
+
+  let player = { x: 325, y: 380, width: 50, height: 45 };
+  let objects = [];
+  let score = 0;
+  let running = true;
+  let frame = 0;
+
+  function drawPlayer() {
+    ctx.font = "40px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("🚀", player.x + 25, player.y + 38);
+  }
+
+  function createObject() {
+    const isStar = Math.random() > 0.65;
+
+    objects.push({
+      x: Math.random() * 660,
+      y: -30,
+      type: isStar ? "⭐" : "☄️",
+      speed: isStar ? 3 : 4,
+      size: 30
+    });
+  }
+
+  function drawObjects() {
+    objects.forEach(object => {
+      ctx.font = "28px Arial";
+      ctx.fillText(object.type, object.x, object.y);
+    });
+  }
+
+  function moveObjects() {
+    objects.forEach(object => {
+      object.y += object.speed;
+    });
+
+    objects = objects.filter(object => object.y < 480);
+  }
+
+  function checkCollisions() {
+    objects.forEach((object, index) => {
+      const touching =
+        object.x < player.x + player.width &&
+        object.x + object.size > player.x &&
+        object.y < player.y + player.height &&
+        object.y + object.size > player.y;
+
+      if (touching) {
+        if (object.type === "⭐") {
+          score += 10;
+          scoreDisplay.textContent = score;
+          objects.splice(index, 1);
+        } else {
+          endGame();
+        }
+      }
+    });
+  }
+
+  function drawBackground() {
+    ctx.fillStyle = "#080b25";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < 35; i++) {
+      const x = (i * 97) % canvas.width;
+      const y = (i * 61 + frame * 2) % canvas.height;
+
+      ctx.fillStyle = "white";
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }
+
+  function gameLoop() {
+    if (!running) return;
+
+    frame++;
+
+    drawBackground();
+
+    if (frame % 45 === 0) {
+      createObject();
+    }
+
+    moveObjects();
+    drawObjects();
+    drawPlayer();
+    checkCollisions();
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  function endGame() {
+    running = false;
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = "38px Arial";
+    ctx.fillText("GAME OVER", 350, 200);
+
+    ctx.font = "22px Arial";
+    ctx.fillText("Final Score: " + score, 350, 245);
+  }
+
+  function movePlayer(position) {
+    player.x = Math.max(
+      0,
+      Math.min(canvas.width - player.width, position - player.width / 2)
+    );
+  }
+
+  canvas.addEventListener("pointermove", event => {
+    if (!running) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const position =
+      (event.clientX - rect.left) * (canvas.width / rect.width);
+
+    movePlayer(position);
+  });
+
+  document.addEventListener("keydown", event => {
+    if (!running) return;
+
+    if (event.key === "ArrowLeft") {
+      player.x = Math.max(0, player.x - 25);
+    }
+
+    if (event.key === "ArrowRight") {
+      player.x = Math.min(canvas.width - player.width, player.x + 25);
+    }
+  });
+
+  document.getElementById("restart-space").addEventListener("click", () => {
+    startSpaceRunner();
+  });
+
+  gameLoop();
+}
