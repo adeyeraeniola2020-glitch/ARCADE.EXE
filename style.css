@@ -667,3 +667,60 @@ footer p {
     padding: 16px 4%;
   }
 }
+/* SPACE RUNNER GAME */
+
+.space-game {
+  width: 100%;
+  text-align: center;
+}
+
+.space-score {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+#space-canvas {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+  margin: 0 auto;
+  background: #080b25;
+  border: 2px solid #00d9ff;
+  border-radius: 12px;
+  touch-action: none;
+}
+
+.space-help {
+  color: #c4c9df;
+  line-height: 1.6;
+  margin: 15px auto;
+  max-width: 550px;
+}
+
+#restart-space {
+  background: linear-gradient(90deg, #713bff, #00bfff);
+  color: white;
+  border: none;
+  padding: 13px 28px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#restart-space:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .space-score {
+    font-size: 17px;
+  }
+
+  .space-help {
+    font-size: 13px;
+  }
+}
