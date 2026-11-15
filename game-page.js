@@ -54,11 +54,13 @@ if (game) {
 
   startButton.textContent = "START GAME";
 
-  startButton.addEventListener("click", () => {
+startButton.addEventListener("click", () => {
   if (game.id === "space-runner") {
     startSpaceRunner();
   } else if (game.id === "memory-match") {
     startMemoryMatch();
+  } else if (game.id === "candy-match") {
+    startCandyMatch();
   } else {
     screenDescription.textContent =
       "This game is coming soon. Stay tuned!";
@@ -396,4 +398,233 @@ function startMemoryMatch() {
     clearInterval(timer);
     startMemoryMatch();
   });
+}
+function startCandyMatch() {
+  const gameContent = document.getElementById("game-content");
+
+  gameContent.innerHTML = `
+    <div class="candy-game">
+      <div class="candy-stats">
+        <div>⭐ Score: <span id="candy-score">0</span></div>
+        <div>🎯 Moves: <span id="candy-moves">20</span></div>
+      </div>
+
+      <div id="candy-board" class="candy-board"></div>
+
+      <h3 id="candy-message">Match 3 or more identical candies!</h3>
+
+      <button id="candy-restart">RESTART GAME</button>
+    </div>
+  `;
+
+  const board = document.getElementById("candy-board");
+  const scoreDisplay = document.getElementById("candy-score");
+  const movesDisplay = document.getElementById("candy-moves");
+  const message = document.getElementById("candy-message");
+
+  const size = 7;
+  const candies = ["🍓", "🍋", "🍇", "🍊", "🍒", "🍬"];
+
+  let grid = [];
+  let score = 0;
+  let moves = 20;
+  let selected = null;
+  let locked = false;
+
+  function randomCandy() {
+    return candies[Math.floor(Math.random() * candies.length)];
+  }
+
+  function createGrid() {
+    grid = [];
+
+    for (let row = 0; row < size; row++) {
+      grid[row] = [];
+
+      for (let col = 0; col < size; col++) {
+        let candy;
+
+        do {
+          candy = randomCandy();
+        } while (
+          (col >= 2 &&
+            grid[row][col - 1] === candy &&
+            grid[row][col - 2] === candy) ||
+          (row >= 2 &&
+            grid[row - 1][col] === candy &&
+            grid[row - 2][col] === candy)
+        );
+
+        grid[row][col] = candy;
+      }
+    }
+  }
+
+  function renderBoard() {
+    board.innerHTML = "";
+
+    grid.forEach((row, r) => {
+      row.forEach((candy, c) => {
+        const cell = document.createElement("button");
+
+        cell.className = "candy-cell";
+        cell.textContent = candy;
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+
+        if (selected && selected.r === r && selected.c === c) {
+          cell.classList.add("selected-candy");
+        }
+
+        cell.addEventListener("click", () => selectCandy(r, c));
+
+        board.appendChild(cell);
+      });
+    });
+  }
+
+  function selectCandy(r, c) {
+    if (locked || moves <= 0) return;
+
+    if (!selected) {
+      selected = { r, c };
+      renderBoard();
+      return;
+    }
+
+    const distance =
+      Math.abs(selected.r - r) + Math.abs(selected.c - c);
+
+    if (distance !== 1) {
+      selected = { r, c };
+      renderBoard();
+      return;
+    }
+
+    const first = selected;
+    const second = { r, c };
+
+    selected = null;
+
+    [grid[first.r][first.c], grid[second.r][second.c]] =
+      [grid[second.r][second.c], grid[first.r][first.c]];
+
+    if (findMatches().length === 0) {
+      [grid[first.r][first.c], grid[second.r][second.c]] =
+        [grid[second.r][second.c], grid[first.r][first.c]];
+
+      message.textContent = "That swap didn't make a match!";
+      renderBoard();
+      return;
+    }
+
+    moves--;
+    movesDisplay.textContent = moves;
+
+    renderBoard();
+    clearMatches();
+  }
+
+  function findMatches() {
+    const matches = new Set();
+
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size - 2; c++) {
+        const candy = grid[r][c];
+
+        if (
+          candy &&
+          candy === grid[r][c + 1] &&
+          candy === grid[r][c + 2]
+        ) {
+          let end = c + 2;
+
+          while (end + 1 < size && grid[r][end + 1] === candy) {
+            end++;
+          }
+
+          for (let i = c; i <= end; i++) {
+            matches.add(`${r},${i}`);
+          }
+        }
+      }
+    }
+
+    for (let c = 0; c < size; c++) {
+      for (let r = 0; r < size - 2; r++) {
+        const candy = grid[r][c];
+
+        if (
+          candy &&
+          candy === grid[r + 1][c] &&
+          candy === grid[r + 2][c]
+        ) {
+          let end = r + 2;
+
+          while (end + 1 < size && grid[end + 1][c] === candy) {
+            end++;
+          }
+
+          for (let i = r; i <= end; i++) {
+            matches.add(`${i},${c}`);
+          }
+        }
+      }
+    }
+
+    return [...matches].map(item => item.split(",").map(Number));
+  }
+
+  function clearMatches() {
+    locked = true;
+
+    const matches = findMatches();
+
+    if (matches.length === 0) {
+      locked = false;
+
+      if (moves === 0) {
+        message.textContent = `Game over! Final score: ${score}`;
+      }
+
+      return;
+    }
+
+    score += matches.length * 10;
+    scoreDisplay.textContent = score;
+
+    message.textContent = "Sweet match! 🍬";
+
+    matches.forEach(([r, c]) => {
+      grid[r][c] = null;
+    });
+
+    renderBoard();
+
+    setTimeout(() => {
+      for (let c = 0; c < size; c++) {
+        let remaining = [];
+
+        for (let r = size - 1; r >= 0; r--) {
+          if (grid[r][c] !== null) {
+            remaining.push(grid[r][c]);
+          }
+        }
+
+        for (let r = size - 1; r >= 0; r--) {
+          grid[r][c] = remaining[size - 1 - r] || randomCandy();
+        }
+      }
+
+      renderBoard();
+      clearMatches();
+    }, 300);
+  }
+
+  document.getElementById("candy-restart").addEventListener("click", () => {
+    startCandyMatch();
+  });
+
+  createGrid();
+  renderBoard();
 }
