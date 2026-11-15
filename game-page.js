@@ -57,6 +57,8 @@ if (game) {
   startButton.addEventListener("click", () => {
   if (game.id === "space-runner") {
     startSpaceRunner();
+  } else if (game.id === "memory-match") {
+    startMemoryMatch();
   } else {
     screenDescription.textContent =
       "This game is coming soon. Stay tuned!";
@@ -269,4 +271,129 @@ function startSpaceRunner() {
   });
 
   gameLoop();
+}
+function startMemoryMatch() {
+  const gameContent = document.getElementById("game-content");
+
+  gameContent.innerHTML = `
+    <div class="memory-game">
+      <div class="memory-stats">
+        <div>⏱️ Time: <span id="memory-time">0</span>s</div>
+        <div>🎯 Moves: <span id="memory-moves">0</span></div>
+        <div>⭐ Score: <span id="memory-score">0</span></div>
+      </div>
+
+      <div class="memory-grid" id="memory-grid"></div>
+
+      <h3 id="memory-message">Find all matching pairs!</h3>
+
+      <button id="memory-restart">RESTART GAME</button>
+    </div>
+  `;
+
+  const emojis = [
+    "🚀", "🚀",
+    "🎮", "🎮",
+    "🌟", "🌟",
+    "🐉", "🐉",
+    "⚽", "⚽",
+    "🍕", "🍕",
+    "👑", "👑",
+    "💎", "💎"
+  ];
+
+  emojis.sort(() => Math.random() - 0.5);
+
+  const grid = document.getElementById("memory-grid");
+  const timeDisplay = document.getElementById("memory-time");
+  const movesDisplay = document.getElementById("memory-moves");
+  const scoreDisplay = document.getElementById("memory-score");
+  const message = document.getElementById("memory-message");
+
+  let firstCard = null;
+  let secondCard = null;
+  let locked = false;
+  let moves = 0;
+  let score = 0;
+  let matchedPairs = 0;
+  let seconds = 0;
+  let timer;
+
+  emojis.forEach((emoji, index) => {
+    const card = document.createElement("button");
+
+    card.className = "memory-card";
+    card.textContent = "?";
+    card.dataset.emoji = emoji;
+    card.setAttribute("aria-label", `Card ${index + 1}, hidden`);
+
+    card.addEventListener("click", () => {
+      if (
+        locked ||
+        card.classList.contains("matched") ||
+        card === firstCard ||
+        card.classList.contains("flipped")
+      ) {
+        return;
+      }
+
+      card.textContent = emoji;
+      card.classList.add("flipped");
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      moves++;
+      movesDisplay.textContent = moves;
+
+      locked = true;
+
+      if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+        firstCard.classList.add("matched");
+        secondCard.classList.add("matched");
+
+        score += 10;
+        matchedPairs++;
+
+        scoreDisplay.textContent = score;
+
+        firstCard = null;
+        secondCard = null;
+        locked = false;
+
+        if (matchedPairs === 8) {
+          clearInterval(timer);
+          message.textContent =
+            `🏆 YOU WON! Final score: ${score}`;
+        }
+      } else {
+        setTimeout(() => {
+          firstCard.textContent = "?";
+          secondCard.textContent = "?";
+
+          firstCard.classList.remove("flipped");
+          secondCard.classList.remove("flipped");
+
+          firstCard = null;
+          secondCard = null;
+          locked = false;
+        }, 900);
+      }
+    });
+
+    grid.appendChild(card);
+  });
+
+  timer = setInterval(() => {
+    seconds++;
+    timeDisplay.textContent = seconds;
+  }, 1000);
+
+  document.getElementById("memory-restart").addEventListener("click", () => {
+    clearInterval(timer);
+    startMemoryMatch();
+  });
 }
