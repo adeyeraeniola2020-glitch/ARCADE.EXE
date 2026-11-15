@@ -517,3 +517,153 @@ footer p {
     }
 
 }
+/* INDIVIDUAL GAME PAGE */
+
+.individual-game-page {
+  min-height: 100vh;
+  background: #080b1c;
+  color: white;
+}
+
+.game-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 6%;
+  background: #10152b;
+  border-bottom: 1px solid #252d50;
+}
+
+.game-navbar a {
+  color: #00d9ff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.game-container {
+  width: 88%;
+  max-width: 1200px;
+  margin: 45px auto;
+}
+
+.game-top {
+  margin-bottom: 25px;
+}
+
+.game-top h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+#game-category {
+  display: inline-block;
+  background: #702cff;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.playing-section {
+  background: #111831;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #29345e;
+}
+
+.game-screen {
+  min-height: 350px;
+  background: radial-gradient(circle, #202b55, #080b1c 75%);
+  border: 2px solid #613cff;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.game-screen h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.game-screen p {
+  color: #c4c9df;
+  max-width: 500px;
+  line-height: 1.7;
+}
+
+#start-button {
+  background: linear-gradient(90deg, #713bff, #00bfff);
+  color: white;
+  border: none;
+  padding: 15px 35px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 25px;
+}
+
+#start-button:hover {
+  transform: scale(1.06);
+}
+
+#fullscreen-button {
+  background: #202b55;
+  color: white;
+  border: 1px solid #52608e;
+  padding: 11px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.game-instructions {
+  margin-top: 35px;
+  line-height: 1.8;
+  color: #c4c9df;
+}
+
+.game-instructions h2 {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.related-section {
+  margin-top: 45px;
+}
+
+#related-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+#related-games .game-card {
+  text-decoration: none;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .game-container {
+    width: 92%;
+    margin: 25px auto;
+  }
+
+  .game-top h1 {
+    font-size: 1.8rem;
+  }
+
+  .game-screen {
+    min-height: 280px;
+    padding: 20px;
+  }
+
+  .game-navbar {
+    padding: 16px 4%;
+  }
+}
