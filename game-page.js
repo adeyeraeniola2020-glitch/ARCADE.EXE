@@ -59,8 +59,8 @@ startButton.addEventListener("click", () => {
     startSpaceRunner();
   } else if (game.id === "memory-match") {
     startMemoryMatch();
-  } else if (game.id === "candy-match") {
-    startCandyMatch();
+  } else if (game.id === "brain-master") {
+  startBrainMaster();
   } else {
     screenDescription.textContent =
       "This game is coming soon. Stay tuned!";
@@ -627,4 +627,180 @@ function startCandyMatch() {
 
   createGrid();
   renderBoard();
+}
+function startBrainMaster() {
+  const gameContent = document.getElementById("game-content");
+
+  const questions = [
+    {
+      q: "What comes next: 2, 4, 8, 16, ?",
+      a: ["20", "24", "32", "36"],
+      correct: 2
+    },
+    {
+      q: "How many sides does a hexagon have?",
+      a: ["5", "6", "7", "8"],
+      correct: 1
+    },
+    {
+      q: "What is 15 × 3?",
+      a: ["30", "35", "45", "50"],
+      correct: 2
+    },
+    {
+      q: "Which number is different: 3, 6, 9, 11, 12?",
+      a: ["3", "6", "9", "11"],
+      correct: 3
+    },
+    {
+      q: "What is half of 96?",
+      a: ["42", "46", "48", "52"],
+      correct: 2
+    },
+    {
+      q: "Which is the smallest?",
+      a: ["0.5", "0.25", "0.75", "1"],
+      correct: 1
+    },
+    {
+      q: "How many minutes are in 3 hours?",
+      a: ["120", "150", "180", "200"],
+      correct: 2
+    },
+    {
+      q: "What comes next: 5, 10, 15, 20, ?",
+      a: ["22", "25", "30", "35"],
+      correct: 1
+    },
+    {
+      q: "Which word does not belong?",
+      a: ["Apple", "Mango", "Carrot", "Orange"],
+      correct: 2
+    },
+    {
+      q: "What is 100 divided by 4?",
+      a: ["20", "25", "30", "40"],
+      correct: 1
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let timeLeft = 60;
+  let timer;
+  let answered = false;
+
+  function renderQuestion() {
+    if (current >= questions.length) {
+      finishGame();
+      return;
+    }
+
+    answered = false;
+
+    const question = questions[current];
+
+    gameContent.innerHTML = `
+      <div class="brain-game">
+        <div class="brain-stats">
+          <span>⭐ Score: ${score}</span>
+          <span>⏱️ Time: <b id="brain-time">${timeLeft}</b>s</span>
+          <span>Question: ${current + 1}/10</span>
+        </div>
+
+        <div class="brain-progress">
+          <div style="width:${current * 10}%"></div>
+        </div>
+
+        <h2>${question.q}</h2>
+
+        <div class="brain-options" id="brain-options"></div>
+
+        <p id="brain-feedback">Choose your answer!</p>
+
+        <button id="brain-next" disabled>
+          NEXT QUESTION
+        </button>
+      </div>
+    `;
+
+    const options = document.getElementById("brain-options");
+
+    question.a.forEach((answer, index) => {
+      const button = document.createElement("button");
+
+      button.textContent = answer;
+
+      button.addEventListener("click", () => {
+        if (answered) return;
+
+        answered = true;
+
+        const buttons = options.querySelectorAll("button");
+
+        buttons.forEach((item, i) => {
+          item.disabled = true;
+
+          if (i === question.correct) {
+            item.classList.add("correct-answer");
+          }
+        });
+
+        const feedback = document.getElementById("brain-feedback");
+
+        if (index === question.correct) {
+          score += 10;
+          feedback.textContent = "Correct! +10 points 🎉";
+        } else {
+          button.classList.add("wrong-answer");
+          feedback.textContent = "Not quite! Try the next one.";
+        }
+
+        document.querySelector(".brain-stats span").textContent =
+          `⭐ Score: ${score}`;
+
+        document.getElementById("brain-next").disabled = false;
+      });
+
+      options.appendChild(button);
+    });
+
+    document.getElementById("brain-next").addEventListener("click", () => {
+      current++;
+      renderQuestion();
+    });
+  }
+
+  function finishGame() {
+    clearInterval(timer);
+
+    gameContent.innerHTML = `
+      <div class="brain-results">
+        <h1>🏆 ROUND COMPLETE!</h1>
+        <h2>Your Score: ${score}/100</h2>
+        <p>You completed all 10 Brain Master questions.</p>
+        <button id="brain-replay">PLAY AGAIN</button>
+      </div>
+    `;
+
+    document.getElementById("brain-replay").addEventListener("click", () => {
+      startBrainMaster();
+    });
+  }
+
+  timer = setInterval(() => {
+    timeLeft--;
+
+    const display = document.getElementById("brain-time");
+
+    if (display) {
+      display.textContent = timeLeft;
+    }
+
+    if (timeLeft <= 0) {
+      finishGame();
+    }
+  }, 1000);
+
+  renderQuestion();
 }
